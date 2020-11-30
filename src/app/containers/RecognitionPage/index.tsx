@@ -6,6 +6,8 @@ import { PageWrapper } from 'app/components/PageWrapper';
 import * as faceapi from 'face-api.js';
 import Webcam from 'react-webcam';
 
+let NETLIFY_URL = 'recognize-and-recommend.netlify.app'
+
 export function RecognitionPage() {
     const videoConstraints = {
         width: 1280,
@@ -25,7 +27,7 @@ export function RecognitionPage() {
 
         } else {
             await faceapi.nets.ssdMobilenetv1
-                .loadFromUri('/models')
+                .loadFromUri(NETLIFY_URL + '/models')
                 .then(error => console.log('ssdMobilenetv1 Model Loaded', error));
 
         }
