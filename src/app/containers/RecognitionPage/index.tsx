@@ -27,7 +27,7 @@ export function RecognitionPage() {
 
         } else {
             await faceapi.nets.ssdMobilenetv1
-                .loadFromUri(NETLIFY_URL + '/models')
+                .loadFromUri('/models')
                 .then(error => console.log('ssdMobilenetv1 Model Loaded', error));
 
         }
