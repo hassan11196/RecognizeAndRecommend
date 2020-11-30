@@ -19,10 +19,10 @@ export function App() {
   return (
     <BrowserRouter>
       <Helmet
-        titleTemplate="%s - React Boilerplate"
-        defaultTitle="React Boilerplate"
+        titleTemplate="%s - Recognize	&amp; Recommend"
+        defaultTitle="Recongnize and Recommend"
       >
-        <meta name="description" content="A React Boilerplate application" />
+        <meta name="description" content="Facial Recognition and Recommendation System based Web application" />
       </Helmet>
 
       <Switch>

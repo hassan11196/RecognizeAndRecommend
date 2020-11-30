@@ -12,9 +12,12 @@ export function HomePage() {
         <title>Home Page</title>
         <meta
           name="description"
-          content="A React Boilerplate application homepage"
+          content="Facial Recognition and Recommendation System based Web application"
         />
       </Helmet>
+
+
+
       <NavBar />
       <PageWrapper>
         <Masthead />
