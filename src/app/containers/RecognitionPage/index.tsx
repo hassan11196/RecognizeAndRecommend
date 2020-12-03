@@ -5,6 +5,7 @@ import { PageWrapper } from 'app/components/PageWrapper';
 
 import * as faceapi from 'face-api.js';
 import Webcam from 'react-webcam';
+import axios from 'axios';
 
 let NETLIFY_URL = 'recognize-and-recommend.netlify.app';
 
@@ -128,6 +129,18 @@ export function RecognitionPage() {
                 );
                 // @ts-ignore
                 console.log(croppedBase64);
+                let payload = {
+                    face: croppedBase64
+                }
+                let remote_url;
+                if (process.env.NODE_ENV == 'development') {
+                    remote_url = "http://localhost:8000/"
+                } else {
+                    remote_url = "https://recognize-and-recommend.herokuapp.com/"
+                }
+                axios.post(remote_url + "recognition/recognize-face", payload).then((response) => {
+                    console.log(response.data);
+                });
             }
         }, 2000);
     };
