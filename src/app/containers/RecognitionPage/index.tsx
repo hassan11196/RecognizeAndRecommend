@@ -140,6 +140,8 @@ export function RecognitionPage() {
                 }
                 axios.post(remote_url + "recognition/recognize-face", payload).then((response) => {
                     console.log(response.data);
+                    let data = response.data
+                    alert("User is " + data.data.username);
                 });
             }
         }, 2000);
