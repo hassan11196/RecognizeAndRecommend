@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { NavBar } from '../NavBar';
 import { PageWrapper } from 'app/components/PageWrapper';
-
+import { Modal, Button, Form } from 'react-bootstrap';
 import * as faceapi from 'face-api.js';
 import Webcam from 'react-webcam';
 import axios from 'axios';
@@ -15,8 +15,6 @@ function image64toCanvasRef(
     pixelCrop,
 ) {
     return new Promise(resolve => {
-
-
         const canvas = canvasRef; // document.createElement('canvas');
         // @ts-ignore
         canvas.width = pixelCrop.width;
@@ -27,7 +25,6 @@ function image64toCanvasRef(
         const image = new Image();
         image.src = image64;
         image.onload = function (e) {
-
             // @ts-ignore
             ctx.drawImage(
                 image,
@@ -42,21 +39,54 @@ function image64toCanvasRef(
             );
             // @ts-ignore
             resolve(canvas?.toDataURL());
-
-
         };
         // @ts-ignore
         // return canvas.toDataURL();
-    })
+    });
 }
 
 export function RecognitionPage() {
+    const [status, setStatus] = useState(true);
+    const [show, setShow] = useState(false);
+    const [showAlert, setShowAlert] = useState(true);
+    const [newUserName, setNewUserName] = useState('');
+    const [userPic, setUserPic] = useState('');
+    const handleClose = () => setShow(false);
+
+    const onChange = e => {
+        console.log(e.target.value);
+        setNewUserName(e.target.value);
+    };
     const videoConstraints = {
         width: 1280,
         height: 720,
         facingMode: 'user',
     };
-
+    const submitUserData = () => {
+        handleClose();
+        let remote_url = '';
+        if (process.env.NODE_ENV == 'development') {
+            remote_url = 'https://recognize-and-recommend.herokuapp.com/';
+        } else {
+            remote_url = 'https://recognize-and-recommend.herokuapp.com/';
+        }
+        let payload = {
+            username: newUserName,
+            profile_photo: userPic,
+        };
+        axios.post(remote_url + 'api/v1/users/', payload).then(response => {
+            console.log(response.data);
+            // let data = response.data;
+            // setShowAlert(false)
+            // setShow(true)
+            // if(data === 'unknown'){
+            // setStatus(false)
+            // }
+            // if(showAlert === true){
+            //     alert("User is " + data.name);
+            // }
+        });
+    };
     const webcamRef = React.useRef(null);
     const detectFace = async function () {
         console.log('Hwllo');
@@ -67,18 +97,15 @@ export function RecognitionPage() {
                 .loadFromUri('/models')
                 .then(error => {
                     console.log('ssdMobilenetv1 Model Loaded', error);
-                    alert("Model Loaded. Face Detection Will Start Now.")
-                }
-
-                );
+                    // alert("Model Loaded. Face Detection Will Start Now.")
+                });
         } else {
             await faceapi.nets.ssdMobilenetv1
                 .loadFromUri('/models')
                 .then(error => {
                     console.log('ssdMobilenetv1 Model Loaded', error);
-                    alert("Model Loaded. Face Detection Will Start Now.")
-                }
-                );
+                    alert('Model Loaded. Face Detection Will Start Now.');
+                });
         }
 
         // const input = document.getElementsByTagName('video')[0];
@@ -97,7 +124,7 @@ export function RecognitionPage() {
             // @ts-ignore
             const detection = await faceapi.detectSingleFace(input);
             if (detection != undefined) {
-                console.log(detection);
+                // console.log(detection);
 
                 const displaySize = videoConstraints;
                 const canvas = document.getElementById('overlay');
@@ -128,29 +155,45 @@ export function RecognitionPage() {
                     myCrop,
                 );
                 // @ts-ignore
+                setUserPic(croppedBase64);
                 console.log(croppedBase64);
                 let payload = {
-                    face: croppedBase64
-                }
+                    face: croppedBase64,
+                };
                 let remote_url;
                 if (process.env.NODE_ENV == 'development') {
-                    remote_url = "http://localhost:8000/"
+                    remote_url =
+                        'https://recognize-and-recommend.herokuapp.com/';
                 } else {
-                    remote_url = "https://recognize-and-recommend.herokuapp.com/"
+                    remote_url =
+                        'https://recognize-and-recommend.herokuapp.com/';
                 }
-                axios.post(remote_url + "recognition/recognize-face", payload).then((response) => {
-                    console.log(response.data);
-                    let data = response.data
-                    alert("User is " + data.data.name);
-                });
+                if (show === false) {
+                    axios
+                        .post(
+                            remote_url + 'recognition/recognize-face',
+                            payload,
+                        )
+                        .then(response => {
+                            console.log(response.data);
+                            let data = response.data;
+                            setShowAlert(false);
+                            setShow(true);
+                            // if(data === 'unknown'){
+                            setStatus(false);
+                            // }
+                            // if(showAlert === true){
+                            //     alert("User is " + data.name);
+                            // }
+                        });
+                }
             }
-        }, 2000);
+        }, 20000);
     };
 
     useEffect(() => {
         detectFace();
     });
-
     return (
         <>
             <Helmet>
@@ -184,7 +227,7 @@ export function RecognitionPage() {
                 ></canvas>
                 <canvas
                     style={{
-                        display: "none",
+                        display: 'none',
                         position: 'relative',
                         top: 0,
                         left: 0,
@@ -195,6 +238,30 @@ export function RecognitionPage() {
                     id="croppedOverlay"
                 ></canvas>
             </PageWrapper>
+            <Modal show={show} onHide={handleClose}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Modal heading</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form.Group controlId="formBasicEmail">
+                        <Form.Label>Enter Your Name</Form.Label>
+                        <Form.Control
+                            type="text"
+                            name="newUserName"
+                            onChange={onChange}
+                            placeholder="Enter Name"
+                        />
+                        <Form.Text className="text-muted">
+                            We'll never share your data with anyone else.
+                        </Form.Text>
+                    </Form.Group>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="primary" onClick={submitUserData}>
+                        Save Changes
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </>
     );
 }
