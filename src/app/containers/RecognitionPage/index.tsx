@@ -50,6 +50,7 @@ export function RecognitionPage() {
     const [show, setShow] = useState(false);
     const [showAlert, setShowAlert] = useState(true);
     const [newUserName, setNewUserName] = useState('');
+    const [authToken, setAuthToken] = useState('');
     const [userPic, setUserPic] = useState('');
     const handleClose = () => setShow(false);
 
@@ -76,16 +77,99 @@ export function RecognitionPage() {
         };
         axios.post(remote_url + 'api/v1/users/', payload).then(response => {
             console.log(response.data);
-            // let data = response.data;
-            // setShowAlert(false)
-            // setShow(true)
-            // if(data === 'unknown'){
-            // setStatus(false)
-            // }
-            // if(showAlert === true){
-            //     alert("User is " + data.name);
-            // }
+            setAuthToken(response.data.auth_token);
+            alert('User is Created named: ' + response.data.username);
+            saveFace();
         });
+    };
+    const saveFace = () => {
+        let i = 0;
+        for (i = 0; i < 40; i++) {
+            assignTask();
+        }
+        // if(i===39){
+        trainFace();
+        // }
+    };
+    const assignTask = async () => {
+        const input = document.getElementsByTagName('video')[0];
+        // @ts-ignore
+        const detection = await faceapi.detectSingleFace(input);
+        if (detection != undefined) {
+            // console.log(detection);
+
+            const displaySize = videoConstraints;
+            const canvas = document.getElementById('overlay');
+
+            // @ts-ignore
+            const dims = faceapi.matchDimensions(canvas, input, true);
+            // @ts-ignore
+            faceapi.draw.drawDetections(
+                // @ts-ignore
+                canvas,
+                faceapi.resizeResults(detection, displaySize),
+            );
+
+            const croppedCanvas = document.getElementById('croppedOverlay');
+            // @ts-ignore
+            const base64Image = webcamRef?.current?.getScreenshot();
+            // console.log(base64Image)
+            const myCrop = {
+                x: detection.box.x,
+                y: detection.box.y,
+                width: detection.box.width,
+                height: detection.box.height,
+            };
+            let croppedBase64 = await image64toCanvasRef(
+                // @ts-ignore
+                croppedCanvas,
+                base64Image,
+                myCrop,
+            );
+            // @ts-ignore
+            setUserPic(croppedBase64);
+            console.log(croppedBase64);
+            let payload = {
+                face: croppedBase64,
+            };
+            let remote_url;
+            if (process.env.NODE_ENV == 'development') {
+                remote_url = 'https://recognize-and-recommend.herokuapp.com/';
+            } else {
+                remote_url = 'https://recognize-and-recommend.herokuapp.com/';
+            }
+            let newPayload = {
+                face: userPic,
+            };
+            console.log(authToken);
+            axios
+                .post(remote_url + 'recognition/save-face', newPayload, {
+                    headers: {
+                        Authorization: authToken,
+                    },
+                })
+                .then(res => {
+                    console.log(res);
+                });
+        }
+    };
+    const trainFace = async () => {
+        let remote_url;
+        if (process.env.NODE_ENV == 'development') {
+            remote_url = 'https://recognize-and-recommend.herokuapp.com/';
+        } else {
+            remote_url = 'https://recognize-and-recommend.herokuapp.com/';
+        }
+        axios
+            .post(remote_url + 'recognition/train-face', {
+                headers: {
+                    Authorization: authToken,
+                },
+            })
+            .then(response => {
+                console.log(response.data);
+                let data = response.data;
+            });
     };
     const webcamRef = React.useRef(null);
     const detectFace = async function () {
@@ -104,7 +188,7 @@ export function RecognitionPage() {
                 .loadFromUri('/models')
                 .then(error => {
                     console.log('ssdMobilenetv1 Model Loaded', error);
-                    alert('Model Loaded. Face Detection Will Start Now.');
+                    // alert('Model Loaded. Face Detection Will Start Now.');
                 });
         }
 
@@ -176,15 +260,14 @@ export function RecognitionPage() {
                         )
                         .then(response => {
                             console.log(response.data);
-                            let data = response.data;
+                            let data = response.data.data;
                             setShowAlert(false);
-                            setShow(true);
-                            // if(data === 'unknown'){
-                            setStatus(false);
-                            // }
-                            // if(showAlert === true){
-                            //     alert("User is " + data.name);
-                            // }
+                            console.log(data.name);
+                            if (data.name === 'unknown') {
+                                setShow(true);
+
+                                setStatus(false);
+                            }
                         });
                 }
             }
