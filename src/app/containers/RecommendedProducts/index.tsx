@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Row, Col, Breadcrumb } from 'react-bootstrap';
 
 import { ProductCard } from 'react-ui-cards';
@@ -7,6 +7,7 @@ import { Redirect } from 'react-router-dom';
 import { Header, Icon, Divider } from 'semantic-ui-react';
 import Navbar from 'reactjs-navbar';
 import logo192 from './logo192.png';
+import axios from 'axios';
 
 import {
     faUsers,
@@ -17,14 +18,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 export default function Products() {
-    const [status, setStatus] = React.useState(false);
-    const setProperties = details => {
-        var properties = details;
-        localStorage.setItem('properties', JSON.stringify(properties));
-        console.log(properties);
-        setStatus(true);
-    };
-    const details = [
+    const detail = [
         {
             photos: [
                 'https://i.imgur.com/jRVDeI8.jpg',
@@ -166,6 +160,69 @@ export default function Products() {
             url: 'https://github.com/nukeop',
         },
     ];
+    const [status, setStatus] = React.useState(false);
+    const [category, setCategory] = React.useState([]);
+    const [details, setDetails] = React.useState(detail);
+    const setProperties = details => {
+        var properties = details;
+        localStorage.setItem('properties', JSON.stringify(properties));
+        console.log(properties);
+        setStatus(true);
+    };
+    const getCategories = () => {
+        axios
+            .get(
+                'https://recognize-and-recommend.herokuapp.com/recommendation/category/',
+            )
+            .then(response => {
+                setCategory(response.data);
+            });
+    };
+
+    const getProducts = () => {
+        axios
+            .get(
+                'https://recognize-and-recommend.herokuapp.com/recommendation/product/',
+            )
+            .then(response => {
+                console.log(response.data);
+                let productData = response.data;
+                console.log(productData);
+                productData.map((data, i) => {
+                    let categoryData = [];
+                    data['photos'] = data.images;
+                    data['price'] = data.price;
+                    if (data.title.length > 20) {
+                        data['productName'] = data.title.slice(0, 20) + ' ...';
+                    } else {
+                        data['productName'] = data.title;
+                    }
+                    data['title'] = data.title;
+                    data['description'] = data.description;
+                    data['buttonText'] = 'Add to cart';
+                    data['rating'] = 3;
+                    data.categories.map((cat, i) => {
+                        if (cat < category.length) {
+                            console.log(category[cat], cat);
+                            categoryData = [...categoryData, category[cat]];
+                            // data.catagories [i] = category[cat]
+                        }
+                    });
+                    data['categories'] = categoryData;
+                });
+                setDetails(productData);
+            });
+    };
+    useEffect(() => {
+        getCategories();
+        // getProducts();
+    }, []);
+    useEffect(() => {
+        if (category.length > 0) {
+            getProducts();
+        }
+    }, [category]);
+
     if (status === true) {
         return <Redirect to="/details" />;
     }

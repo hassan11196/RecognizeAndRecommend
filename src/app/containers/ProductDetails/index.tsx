@@ -36,7 +36,7 @@ function ProductDetails() {
         var details = JSON.parse(localStorage.getItem('properties') || '{}');
         setDetails(details);
         setProductDescription(details.description);
-        setProductName(details.productName);
+        setProductName(details.title);
         setPrice(details.price);
         console.log(details);
         var picsArray: any = [];
