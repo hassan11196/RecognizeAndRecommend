@@ -48,8 +48,8 @@ function ProductDetails() {
         console.log(length);
         var i = 0;
         for (i = 0; i < length; i++) {
-            pictures.original = details.photos[i] || '';
-            pictures.thumbnail = details.photos[i] || '';
+            pictures.original = details.images[i] || '';
+            pictures.thumbnail = details.images[i] || '';
             picsArray.push(pictures);
         }
         setImages(picsArray);

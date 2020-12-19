@@ -162,6 +162,9 @@ export default function Products() {
     ];
     const [status, setStatus] = React.useState(false);
     const [category, setCategory] = React.useState([]);
+    const [images, setImages] = React.useState([]);
+    const [price, setPrice] = React.useState([]);
+    const [bullets, setBullets] = React.useState([]);
     const [details, setDetails] = React.useState(detail);
     const setProperties = details => {
         var properties = details;
@@ -175,10 +178,40 @@ export default function Products() {
                 'https://recognize-and-recommend.herokuapp.com/recommendation/category/',
             )
             .then(response => {
+                console.log(response.data);
                 setCategory(response.data);
             });
     };
-
+    const getImages = () => {
+        axios
+            .get(
+                'https://recognize-and-recommend.herokuapp.com/recommendation/productimage/',
+            )
+            .then(response => {
+                console.log(response.data);
+                setImages(response.data);
+            });
+    };
+    const getPrice = () => {
+        axios
+            .get(
+                'https://recognize-and-recommend.herokuapp.com/recommendation/productprice/',
+            )
+            .then(response => {
+                console.log(response.data);
+                setPrice(response.data);
+            });
+    };
+    const getBullets = () => {
+        axios
+            .get(
+                'https://recognize-and-recommend.herokuapp.com/recommendation/productfeaturebullet/',
+            )
+            .then(response => {
+                console.log(response.data);
+                setBullets(response.data);
+            });
+    };
     const getProducts = () => {
         axios
             .get(
@@ -187,9 +220,11 @@ export default function Products() {
             .then(response => {
                 console.log(response.data);
                 let productData = response.data;
-                console.log(productData);
                 productData.map((data, i) => {
                     let categoryData = [];
+                    let priceData = '';
+                    let bulletsData = [];
+                    let imagesData = [];
                     data['photos'] = data.images;
                     data['price'] = data.price;
                     if (data.title.length > 20) {
@@ -203,25 +238,54 @@ export default function Products() {
                     data['rating'] = 3;
                     data.categories.map((cat, i) => {
                         if (cat < category.length) {
-                            console.log(category[cat], cat);
                             categoryData = [...categoryData, category[cat]];
-                            // data.catagories [i] = category[cat]
                         }
                     });
+                    if (price.length > data.price) {
+                        priceData = price[data.price];
+                        data.price =
+                            priceData['symbol'] +
+                            priceData['current_price'].toString();
+                    }
+                    data.images.map((cat, i) => {
+                        if (cat < images.length) {
+                            // let newImage:any = images[cat]['image'];
+                            imagesData = [...imagesData, images[cat]['image']];
+                        }
+                    });
+                    data.feature_bullets.map((cat, i) => {
+                        if (cat < bulletsData) {
+                            bulletsData = [
+                                ...bulletsData,
+                                bullets[cat]['feature_bullet'],
+                            ];
+                        }
+                    });
+                    if (images.length) data['images'] = imagesData;
+                    data['photos'] = imagesData;
                     data['categories'] = categoryData;
+                    data['feature_bullets'] = bulletsData;
                 });
+
                 setDetails(productData);
             });
     };
     useEffect(() => {
         getCategories();
-        // getProducts();
+        getBullets();
+        getImages();
+        getPrice();
     }, []);
     useEffect(() => {
-        if (category.length > 0) {
+        if (
+            category.length > 0 &&
+            images.length > 0 &&
+            price.length > 0 &&
+            bullets.length > 0
+        ) {
             getProducts();
         }
-    }, [category]);
+    }, [category, bullets, images, price]);
 
     if (status === true) {
         return <Redirect to="/details" />;
