@@ -6,6 +6,7 @@ import { Modal, Button, Form } from 'react-bootstrap';
 import * as faceapi from 'face-api.js';
 import Webcam from 'react-webcam';
 import axios from 'axios';
+import { Redirect } from 'react-router-dom';
 
 let NETLIFY_URL = 'recognize-and-recommend.netlify.app';
 
@@ -47,6 +48,8 @@ function image64toCanvasRef(
 
 export function RecognitionPage() {
     const [status, setStatus] = useState(true);
+    const [redirectTool, setRedirectTool] = useState(false);
+    const [activeAPI, setActiveAPI] = useState(true);
     const [show, setShow] = useState(false);
     const [showAlert, setShowAlert] = useState(true);
     const [newUserName, setNewUserName] = useState('');
@@ -71,111 +74,21 @@ export function RecognitionPage() {
         } else {
             remote_url = 'https://recognize-and-recommend.herokuapp.com/';
         }
+        console.log(userPic);
         let payload = {
             username: newUserName,
             profile_photo: userPic,
         };
-        axios.post(remote_url + 'api/v1/users/', payload).then(response => {
-            console.log(response.data);
-            setAuthToken(response.data.auth_token);
-            alert('User is Created named: ' + response.data.username);
-            saveFace();
-        });
-    };
-    const saveFace = () => {
-        let i = 0;
-        for (i = 0; i < 40; i++) {
-            assignTask();
-        }
-        // if(i===39){
-        trainFace();
-        // }
-    };
-    const assignTask = async () => {
-        const input = document.getElementsByTagName('video')[0];
-        // @ts-ignore
-        const detection = await faceapi.detectSingleFace(input);
-        if (detection != undefined) {
-            // console.log(detection);
-
-            const displaySize = videoConstraints;
-            const canvas = document.getElementById('overlay');
-
-            // @ts-ignore
-            const dims = faceapi.matchDimensions(canvas, input, true);
-            // @ts-ignore
-            faceapi.draw.drawDetections(
-                // @ts-ignore
-                canvas,
-                faceapi.resizeResults(detection, displaySize),
-            );
-
-            const croppedCanvas = document.getElementById('croppedOverlay');
-            // @ts-ignore
-            const base64Image = webcamRef?.current?.getScreenshot();
-            // console.log(base64Image)
-            const myCrop = {
-                x: detection.box.x,
-                y: detection.box.y,
-                width: detection.box.width,
-                height: detection.box.height,
-            };
-            let croppedBase64 = await image64toCanvasRef(
-                // @ts-ignore
-                croppedCanvas,
-                base64Image,
-                myCrop,
-            );
-            // @ts-ignore
-            setUserPic(croppedBase64);
-            console.log(croppedBase64);
-            let payload = {
-                face: croppedBase64,
-            };
-            let remote_url;
-            if (process.env.NODE_ENV == 'development') {
-                remote_url = 'https://recognize-and-recommend.herokuapp.com/';
-            } else {
-                remote_url = 'https://recognize-and-recommend.herokuapp.com/';
-            }
-            let newPayload = {
-                face: userPic,
-            };
-            console.log(authToken);
-            axios
-                .post(remote_url + 'recognition/save-face', newPayload, {
-                    headers: {
-                        Authorization: authToken,
-                    },
-                })
-                .then(res => {
-                    console.log(res);
-                });
-        }
-    };
-    const trainFace = async () => {
-        let remote_url;
-        if (process.env.NODE_ENV == 'development') {
-            remote_url = 'https://recognize-and-recommend.herokuapp.com/';
-        } else {
-            remote_url = 'https://recognize-and-recommend.herokuapp.com/';
-        }
         axios
-            .post(remote_url + 'recognition/train-face', {
-                headers: {
-                    Authorization: authToken,
-                },
-            })
+            .post(remote_url + 'recognition/create-user/', payload)
             .then(response => {
                 console.log(response.data);
-                let data = response.data;
+                setAuthToken(response.data.auth_token);
+                alert('User is Created named: ' + response.data.username);
             });
     };
     const webcamRef = React.useRef(null);
     const detectFace = async function () {
-        console.log('Hwllo');
-
-        console.log(0);
         if (process.env.NODE_ENV == 'development') {
             await faceapi.nets.ssdMobilenetv1
                 .loadFromUri('/models')
@@ -192,83 +105,75 @@ export function RecognitionPage() {
                 });
         }
 
-        // const input = document.getElementsByTagName('video')[0];
-        // console.log(1);
-        // // @ts-ignore
-        // const detection = await faceapi.detectSingleFace(input);
-        // console.log(2);
-        // console.log(detection);
-
         setInterval(async () => {
-            // @ts-ignore: Object is possibly 'null'.
-            //   const imageSrc = webcamRef?.current?.getScreenshot();
-            //   console.log(imageSrc)
-
-            const input = document.getElementsByTagName('video')[0];
-            // @ts-ignore
-            const detection = await faceapi.detectSingleFace(input);
-            if (detection != undefined) {
-                // console.log(detection);
-
-                const displaySize = videoConstraints;
-                const canvas = document.getElementById('overlay');
-
+            if (redirectTool === false) {
+                const input = document.getElementsByTagName('video')[0];
                 // @ts-ignore
-                const dims = faceapi.matchDimensions(canvas, input, true);
-                // @ts-ignore
-                faceapi.draw.drawDetections(
+                const detection = await faceapi.detectSingleFace(input);
+                if (detection != undefined) {
+                    const displaySize = videoConstraints;
+                    const canvas = document.getElementById('overlay');
+
                     // @ts-ignore
-                    canvas,
-                    faceapi.resizeResults(detection, displaySize),
-                );
-
-                const croppedCanvas = document.getElementById('croppedOverlay');
-                // @ts-ignore
-                const base64Image = webcamRef?.current?.getScreenshot();
-                // console.log(base64Image)
-                const myCrop = {
-                    x: detection.box.x,
-                    y: detection.box.y,
-                    width: detection.box.width,
-                    height: detection.box.height,
-                };
-                let croppedBase64 = await image64toCanvasRef(
+                    const dims = faceapi.matchDimensions(canvas, input, true);
                     // @ts-ignore
-                    croppedCanvas,
-                    base64Image,
-                    myCrop,
-                );
-                // @ts-ignore
-                setUserPic(croppedBase64);
-                console.log(croppedBase64);
-                let payload = {
-                    face: croppedBase64,
-                };
-                let remote_url;
-                if (process.env.NODE_ENV == 'development') {
-                    remote_url =
-                        'https://recognize-and-recommend.herokuapp.com/';
-                } else {
-                    remote_url =
-                        'https://recognize-and-recommend.herokuapp.com/';
-                }
-                if (show === false) {
-                    axios
-                        .post(
-                            remote_url + 'recognition/recognize-face',
-                            payload,
-                        )
-                        .then(response => {
-                            console.log(response.data);
-                            let data = response.data.data;
-                            setShowAlert(false);
-                            console.log(data.name);
-                            if (data.name === 'unknown') {
-                                setShow(true);
+                    faceapi.draw.drawDetections(
+                        // @ts-ignore
+                        canvas,
+                        faceapi.resizeResults(detection, displaySize),
+                    );
 
-                                setStatus(false);
-                            }
-                        });
+                    const croppedCanvas = document.getElementById(
+                        'croppedOverlay',
+                    );
+                    // @ts-ignore
+                    const base64Image = webcamRef?.current?.getScreenshot();
+                    const myCrop = {
+                        x: detection.box.x,
+                        y: detection.box.y,
+                        width: detection.box.width,
+                        height: detection.box.height,
+                    };
+                    let croppedBase64 = await image64toCanvasRef(
+                        // @ts-ignore
+                        croppedCanvas,
+                        base64Image,
+                        myCrop,
+                    );
+                    // @ts-ignore
+                    // setUserPic(croppedBase64);
+                    // console.log(croppedBase64);
+                    let payload = {
+                        face: croppedBase64,
+                    };
+                    let remote_url;
+                    if (process.env.NODE_ENV == 'development') {
+                        remote_url =
+                            'https://recognize-and-recommend.herokuapp.com/';
+                    } else {
+                        remote_url =
+                            'https://recognize-and-recommend.herokuapp.com/';
+                    }
+                    if (activeAPI === true) {
+                        axios
+                            .post(
+                                remote_url + 'recognition/recognize-face',
+                                payload,
+                            )
+                            .then(response => {
+                                console.log(response.data);
+                                let data = response.data.data;
+                                setShowAlert(false);
+                                console.log(data.name);
+                                if (data.name === 'unknown') {
+                                    setShow(true);
+                                    setStatus(false);
+                                    setActiveAPI(false);
+                                } else {
+                                    setRedirectTool(true);
+                                }
+                            });
+                    }
                 }
             }
         }, 20000);
@@ -277,74 +182,80 @@ export function RecognitionPage() {
     useEffect(() => {
         detectFace();
     });
-    return (
-        <>
-            <Helmet>
-                <title>Home</title>
-                <meta name="description" content="Recognize and Recommend." />
-            </Helmet>
-            {/* <NavBar /> */}
-            <PageWrapper>
-                <Webcam
-                    style={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        backgroundSize: 'cover',
-                        width: '100%',
-                        minHeight: '100%',
-                    }}
-                    ref={webcamRef}
-                    videoConstraints={videoConstraints}
-                />
-                <canvas
-                    style={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        backgroundSize: 'cover',
-                        width: '100%',
-                        minHeight: '100%',
-                    }}
-                    id="overlay"
-                ></canvas>
-                <canvas
-                    style={{
-                        display: 'none',
-                        position: 'relative',
-                        top: 0,
-                        left: 0,
-                        backgroundSize: 'cover',
-                        width: '100%',
-                        minHeight: '100%',
-                    }}
-                    id="croppedOverlay"
-                ></canvas>
-            </PageWrapper>
-            <Modal show={show} onHide={handleClose}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Modal heading</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <Form.Group controlId="formBasicEmail">
-                        <Form.Label>Enter Your Name</Form.Label>
-                        <Form.Control
-                            type="text"
-                            name="newUserName"
-                            onChange={onChange}
-                            placeholder="Enter Name"
-                        />
-                        <Form.Text className="text-muted">
-                            We'll never share your data with anyone else.
-                        </Form.Text>
-                    </Form.Group>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="primary" onClick={submitUserData}>
-                        Save Changes
-                    </Button>
-                </Modal.Footer>
-            </Modal>
-        </>
-    );
+    if (redirectTool === true) {
+        return <Redirect to="/user-products" />;
+    } else
+        return (
+            <>
+                <Helmet>
+                    <title>Home</title>
+                    <meta
+                        name="description"
+                        content="Recognize and Recommend."
+                    />
+                </Helmet>
+                {/* <NavBar /> */}
+                <PageWrapper>
+                    <Webcam
+                        style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            backgroundSize: 'cover',
+                            width: '100%',
+                            minHeight: '100%',
+                        }}
+                        ref={webcamRef}
+                        videoConstraints={videoConstraints}
+                    />
+                    <canvas
+                        style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            backgroundSize: 'cover',
+                            width: '100%',
+                            minHeight: '100%',
+                        }}
+                        id="overlay"
+                    ></canvas>
+                    <canvas
+                        style={{
+                            display: 'none',
+                            position: 'relative',
+                            top: 0,
+                            left: 0,
+                            backgroundSize: 'cover',
+                            width: '100%',
+                            minHeight: '100%',
+                        }}
+                        id="croppedOverlay"
+                    ></canvas>
+                </PageWrapper>
+                <Modal show={show} onHide={handleClose}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Modal heading</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <Form.Group controlId="formBasicEmail">
+                            <Form.Label>Enter Your Name</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="newUserName"
+                                onChange={onChange}
+                                placeholder="Enter Name"
+                            />
+                            <Form.Text className="text-muted">
+                                We'll never share your data with anyone else.
+                            </Form.Text>
+                        </Form.Group>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="primary" onClick={submitUserData}>
+                            Save Changes
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
+            </>
+        );
 }

@@ -1,12 +1,23 @@
 import React, { useEffect } from 'react';
 import { Row, Col, Breadcrumb } from 'react-bootstrap';
 
-import { ProductCard } from 'react-ui-cards';
+import { ProductCard, UserCard } from 'react-ui-cards';
+import { FacebookProvider, Like } from 'react-facebook';
+
 import { ReactNavbar } from 'react-responsive-animate-navbar';
 import { Redirect } from 'react-router-dom';
-import { Header, Icon, Divider } from 'semantic-ui-react';
+import {
+    Header,
+    Icon,
+    Divider,
+    Dimmer,
+    Loader,
+    Image,
+    Segment,
+} from 'semantic-ui-react';
 import Navbar from 'reactjs-navbar';
 import axios from 'axios';
+import pic from './bg.png';
 
 import {
     faUsers,
@@ -16,7 +27,7 @@ import {
     faCogs /*...*/,
 } from '@fortawesome/free-solid-svg-icons';
 
-export default function Products() {
+export default function UserProducts() {
     const detail = [
         {
             photos: [
@@ -31,140 +42,18 @@ export default function Products() {
             buttonText: 'Add to cart',
             rating: 3,
             url: 'https://github.com/nukeop',
-        },
-        {
-            photos: [
-                'https://i.imgur.com/jRVDeI8.jpg',
-                'https://i.imgur.com/raPe27t.jpg',
-                'https://i.imgur.com/IpEsYSH.jpg',
-            ],
-            price: '$99',
-            productName: 'Headphones',
-            description:
-                'Donec lectus nulla, molestie aliquam nisl vitae, tempor placerat magna. Morbi dignissim in felis vel aliquet.',
-            buttonText: 'Add to cart',
-            rating: 3,
-            url: 'https://github.com/nukeop',
-        },
-        {
-            photos: [
-                'https://i.imgur.com/jRVDeI8.jpg',
-                'https://i.imgur.com/raPe27t.jpg',
-                'https://i.imgur.com/IpEsYSH.jpg',
-            ],
-            price: '$99',
-            productName: 'Headphones',
-            description:
-                'Donec lectus nulla, molestie aliquam nisl vitae, tempor placerat magna. Morbi dignissim in felis vel aliquet.',
-            buttonText: 'Add to cart',
-            rating: 3,
-            url: 'https://github.com/nukeop',
-        },
-        {
-            photos: [
-                'https://i.imgur.com/jRVDeI8.jpg',
-                'https://i.imgur.com/raPe27t.jpg',
-                'https://i.imgur.com/IpEsYSH.jpg',
-            ],
-            price: '$99',
-            productName: 'Headphones',
-            description:
-                'Donec lectus nulla, molestie aliquam nisl vitae, tempor placerat magna. Morbi dignissim in felis vel aliquet.',
-            buttonText: 'Add to cart',
-            rating: 3,
-            url: 'https://github.com/nukeop',
-        },
-        {
-            photos: [
-                'https://i.imgur.com/jRVDeI8.jpg',
-                'https://i.imgur.com/raPe27t.jpg',
-                'https://i.imgur.com/IpEsYSH.jpg',
-            ],
-            price: '$99',
-            productName: 'Headphones',
-            description:
-                'Donec lectus nulla, molestie aliquam nisl vitae, tempor placerat magna. Morbi dignissim in felis vel aliquet.',
-            buttonText: 'Add to cart',
-            rating: 3,
-            url: 'https://github.com/nukeop',
-        },
-        {
-            photos: [
-                'https://i.imgur.com/jRVDeI8.jpg',
-                'https://i.imgur.com/raPe27t.jpg',
-                'https://i.imgur.com/IpEsYSH.jpg',
-            ],
-            price: '$99',
-            productName: 'Headphones',
-            description:
-                'Donec lectus nulla, molestie aliquam nisl vitae, tempor placerat magna. Morbi dignissim in felis vel aliquet.',
-            buttonText: 'Add to cart',
-            rating: 3,
-            url: 'https://github.com/nukeop',
-        },
-        {
-            photos: [
-                'https://i.imgur.com/jRVDeI8.jpg',
-                'https://i.imgur.com/raPe27t.jpg',
-                'https://i.imgur.com/IpEsYSH.jpg',
-            ],
-            price: '$99',
-            productName: 'Headphones',
-            description:
-                'Donec lectus nulla, molestie aliquam nisl vitae, tempor placerat magna. Morbi dignissim in felis vel aliquet.',
-            buttonText: 'Add to cart',
-            rating: 3,
-            url: 'https://github.com/nukeop',
-        },
-        {
-            photos: [
-                'https://i.imgur.com/jRVDeI8.jpg',
-                'https://i.imgur.com/raPe27t.jpg',
-                'https://i.imgur.com/IpEsYSH.jpg',
-            ],
-            price: '$99',
-            productName: 'Headphones',
-            description:
-                'Donec lectus nulla, molestie aliquam nisl vitae, tempor placerat magna. Morbi dignissim in felis vel aliquet.',
-            buttonText: 'Add to cart',
-            rating: 3,
-            url: 'https://github.com/nukeop',
-        },
-        {
-            photos: [
-                'https://i.imgur.com/jRVDeI8.jpg',
-                'https://i.imgur.com/raPe27t.jpg',
-                'https://i.imgur.com/IpEsYSH.jpg',
-            ],
-            price: '$99',
-            productName: 'Headphones',
-            description:
-                'Donec lectus nulla, molestie aliquam nisl vitae, tempor placerat magna. Morbi dignissim in felis vel aliquet.',
-            buttonText: 'Add to cart',
-            rating: 3,
-            url: 'https://github.com/nukeop',
-        },
-        {
-            photos: [
-                'https://i.imgur.com/jRVDeI8.jpg',
-                'https://i.imgur.com/raPe27t.jpg',
-                'https://i.imgur.com/IpEsYSH.jpg',
-            ],
-            price: '$99',
-            productName: 'Headphones',
-            description:
-                'Donec lectus nulla, molestie aliquam nisl vitae, tempor placerat magna. Morbi dignissim in felis vel aliquet.',
-            buttonText: 'Add to cart',
-            rating: 3,
-            url: 'https://github.com/nukeop',
+            currency: '',
+            mainImage: '',
         },
     ];
     const [status, setStatus] = React.useState(false);
+    const [loader, setLoader] = React.useState(true);
     const [category, setCategory] = React.useState([]);
     const [images, setImages] = React.useState([]);
     const [price, setPrice] = React.useState([]);
     const [bullets, setBullets] = React.useState([]);
     const [details, setDetails] = React.useState(detail);
+
     const setProperties = details => {
         var properties = details;
         localStorage.setItem('properties', JSON.stringify(properties));
@@ -222,13 +111,13 @@ export default function Products() {
                 productData.map((data, i) => {
                     let categoryData = [];
                     let priceData = '';
+                    let pics = [];
                     let bulletsData = [];
-                    // let pics:string = [];
                     let imagesData = [];
+                    // pics.push(data.main)
                     data['photos'] = data.images;
-                    // pics.push(data.main_image);
-                    // data['mainImage'] = pics;
-                    data['price'] = data.price;
+
+                    data['newImage'] = data['price'] = data.price;
                     if (data.title.length > 20) {
                         data['productName'] = data.title.slice(0, 20) + ' ...';
                     } else {
@@ -245,6 +134,7 @@ export default function Products() {
                     });
                     if (price.length > data.price) {
                         priceData = price[data.price];
+                        data.currency = priceData['currency'];
                         data.price =
                             priceData['symbol'] +
                             priceData['current_price'].toString();
@@ -265,11 +155,18 @@ export default function Products() {
                     });
                     if (images.length) data['images'] = imagesData;
                     data['photos'] = imagesData;
+                    if (data.main_image !== null) {
+                        data['photos'] = [data.main_image, ...data['photos']];
+                    }
                     data['categories'] = categoryData;
                     data['feature_bullets'] = bulletsData;
                 });
 
                 setDetails(productData);
+            })
+            .then(res => {
+                setLoader(false);
+                console.log(loader);
             });
     };
     useEffect(() => {
@@ -343,32 +240,66 @@ export default function Products() {
                     </Breadcrumb.Item>
                 </Breadcrumb>
             </div>
-            <div style={{ margin: '1rem' }}>
-                <Row>
-                    {details.map((product, i) => {
-                        return (
-                            <Col
-                                xs="3"
-                                key={i}
-                                style={{ marginBottom: '1rem' }}
-                            >
-                                <ProductCard
-                                    onClick={() => {
-                                        setProperties(product);
-                                    }}
-                                    photos={product.photos}
-                                    price={product.price}
-                                    productName={product.productName}
-                                    description={product.description}
-                                    buttonText={product.buttonText}
-                                    rating={product.rating}
-                                    url={product.url}
-                                />
-                            </Col>
-                        );
-                    })}
-                </Row>
-            </div>
+
+            {loader === true ? (
+                <Segment>
+                    <Dimmer active inverted>
+                        <Loader size="medium">Loading</Loader>
+                    </Dimmer>
+
+                    <Image src={pic} style={{ opacity: '0.5' }} />
+                </Segment>
+            ) : (
+                <div style={{ marginRight: '2rem' }}>
+                    <Row>
+                        {details.map((product, i) => {
+                            return (
+                                <Col
+                                    xs="3"
+                                    key={i}
+                                    style={{ marginBottom: '1rem' }}
+                                >
+                                    <ProductCard
+                                        onClick={() => {
+                                            setProperties(product);
+                                        }}
+                                        photos={product.photos}
+                                        price={product.price}
+                                        productName={product.productName}
+                                        description={product.description}
+                                        buttonText={product.buttonText}
+                                        rating={product.rating}
+                                        url={product.url}
+                                    />
+                                </Col>
+                            );
+                        })}
+                    </Row>
+                </div>
+            )}
+            {/* <UserCard
+          float
+          href='https://github.com/nukeop'
+          header='https://i.imgur.com/p5yXGQk.jpg'
+          avatar='https://i.imgur.com/kFkyYkZ.jpg'
+          name='Joseph Cheps'
+          positionName='Firmware Engineer'
+          stats={[
+            {
+              name: 'commits',
+              value: 365
+            },
+            {
+              name: 'stars',
+              value: 110
+            },
+            {
+              name: 'repositories',
+              value: 54
+            }
+          ]}
+        />
+             */}
         </div>
     );
 }

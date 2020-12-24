@@ -17,6 +17,7 @@ import { GlobalStyle } from '../styles/global-styles';
 import { HomePage } from './containers/HomePage/Loadable';
 import { RecognitionPage } from './containers/RecognitionPage';
 import { NotFoundPage } from './containers/NotFoundPage/Loadable';
+import UserProducts from './containers/UserProducts';
 import 'semantic-ui-css/semantic.min.css';
 
 // import 'bootstrap/dist/css/bootstrap.min.css';
@@ -48,6 +49,10 @@ export function App() {
                 <Route
                     path={process.env.PUBLIC_URL + '/home'}
                     component={HomePage}
+                />
+                <Route
+                    path={process.env.PUBLIC_URL + '/user-products'}
+                    component={UserProducts}
                 />
                 <Route
                     path={process.env.PUBLIC_URL + '/details'}
