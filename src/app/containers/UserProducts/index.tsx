@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { Row, Col, Breadcrumb } from 'react-bootstrap';
 
 import { ProductCard, UserCard } from 'react-ui-cards';
-import { FacebookProvider, Like } from 'react-facebook';
 
 import { ReactNavbar } from 'react-responsive-animate-navbar';
 import { Redirect } from 'react-router-dom';
@@ -26,7 +25,7 @@ import {
     faChartPie,
     faCogs /*...*/,
 } from '@fortawesome/free-solid-svg-icons';
-
+const API_URL = "http://localhost:8000/"
 export default function UserProducts() {
     const detail = [
         {
@@ -63,7 +62,7 @@ export default function UserProducts() {
     const getCategories = () => {
         axios
             .get(
-                'https://recognize-and-recommend.herokuapp.com/recommendation/category/',
+                API_URL + 'recommendation/category/',
             )
             .then(response => {
                 console.log(response.data);
@@ -73,7 +72,7 @@ export default function UserProducts() {
     const getImages = () => {
         axios
             .get(
-                'https://recognize-and-recommend.herokuapp.com/recommendation/productimage/',
+                API_URL + 'recommendation/productimage/',
             )
             .then(response => {
                 console.log(response.data);
@@ -83,7 +82,7 @@ export default function UserProducts() {
     const getPrice = () => {
         axios
             .get(
-                'https://recognize-and-recommend.herokuapp.com/recommendation/productprice/',
+                API_URL + 'recommendation/productprice/',
             )
             .then(response => {
                 console.log(response.data);
@@ -93,7 +92,7 @@ export default function UserProducts() {
     const getBullets = () => {
         axios
             .get(
-                'https://recognize-and-recommend.herokuapp.com/recommendation/productfeaturebullet/',
+                API_URL + 'recommendation/productfeaturebullet/',
             )
             .then(response => {
                 console.log(response.data);
@@ -103,7 +102,11 @@ export default function UserProducts() {
     const getProducts = () => {
         axios
             .get(
-                'https://recognize-and-recommend.herokuapp.com/recommendation/product/',
+                API_URL + 'recommendation/recommended-products', {
+                    headers: {
+                        "Authorization": "Token " + window.sessionStorage.getItem("auth_token")
+                    }
+                }
             )
             .then(response => {
                 console.log(response.data);
@@ -250,33 +253,33 @@ export default function UserProducts() {
                     <Image src={pic} style={{ opacity: '0.5' }} />
                 </Segment>
             ) : (
-                <div style={{ marginRight: '2rem' }}>
-                    <Row>
-                        {details.map((product, i) => {
-                            return (
-                                <Col
-                                    xs="3"
-                                    key={i}
-                                    style={{ marginBottom: '1rem' }}
-                                >
-                                    <ProductCard
-                                        onClick={() => {
-                                            setProperties(product);
-                                        }}
-                                        photos={product.photos}
-                                        price={product.price}
-                                        productName={product.productName}
-                                        description={product.description}
-                                        buttonText={product.buttonText}
-                                        rating={product.rating}
-                                        url={product.url}
-                                    />
-                                </Col>
-                            );
-                        })}
-                    </Row>
-                </div>
-            )}
+                    <div style={{ marginRight: '2rem' }}>
+                        <Row>
+                            {details.map((product, i) => {
+                                return (
+                                    <Col
+                                        xs="3"
+                                        key={i}
+                                        style={{ marginBottom: '1rem' }}
+                                    >
+                                        <ProductCard
+                                            onClick={() => {
+                                                setProperties(product);
+                                            }}
+                                            photos={product.photos}
+                                            price={product.price}
+                                            productName={product.productName}
+                                            description={product.description}
+                                            buttonText={product.buttonText}
+                                            rating={product.rating}
+                                            url={product.url}
+                                        />
+                                    </Col>
+                                );
+                            })}
+                        </Row>
+                    </div>
+                )}
             {/* <UserCard
           float
           href='https://github.com/nukeop'

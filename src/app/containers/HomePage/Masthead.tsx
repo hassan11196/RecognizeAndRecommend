@@ -17,7 +17,7 @@ export function Masthead() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          React Boilerplate
+          Recognize And Recommend
         </A>{' '}
         as a{' '}
         <A
@@ -25,7 +25,7 @@ export function Masthead() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Create React App
+          R{'&'}R
         </A>{' '}
         template.
       </Lead>

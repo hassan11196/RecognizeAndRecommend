@@ -15,7 +15,7 @@ import {
     faChartPie,
     faCogs /*...*/,
 } from '@fortawesome/free-solid-svg-icons';
-
+const API_URL = "http://localhost:8000/";
 export default function Products() {
     const detail = [
         {
@@ -174,7 +174,7 @@ export default function Products() {
     const getCategories = () => {
         axios
             .get(
-                'https://recognize-and-recommend.herokuapp.com/recommendation/category/',
+                API_URL + 'recommendation/category/',
             )
             .then(response => {
                 console.log(response.data);
@@ -184,7 +184,7 @@ export default function Products() {
     const getImages = () => {
         axios
             .get(
-                'https://recognize-and-recommend.herokuapp.com/recommendation/productimage/',
+                API_URL + 'recommendation/productimage/',
             )
             .then(response => {
                 console.log(response.data);
@@ -194,7 +194,7 @@ export default function Products() {
     const getPrice = () => {
         axios
             .get(
-                'https://recognize-and-recommend.herokuapp.com/recommendation/productprice/',
+                API_URL + 'recommendation/productprice/',
             )
             .then(response => {
                 console.log(response.data);
@@ -204,7 +204,7 @@ export default function Products() {
     const getBullets = () => {
         axios
             .get(
-                'https://recognize-and-recommend.herokuapp.com/recommendation/productfeaturebullet/',
+                API_URL + 'recommendation/productfeaturebullet/',
             )
             .then(response => {
                 console.log(response.data);
@@ -214,7 +214,11 @@ export default function Products() {
     const getProducts = () => {
         axios
             .get(
-                'https://recognize-and-recommend.herokuapp.com/recommendation/product/',
+                API_URL + 'recommendation/recommended-products', {
+                headers: {
+                    "Authorization": "Token " + window.sessionStorage.getItem("user_token")
+                }
+            }
             )
             .then(response => {
                 console.log(response.data);

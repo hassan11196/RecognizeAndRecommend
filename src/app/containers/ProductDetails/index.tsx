@@ -5,6 +5,8 @@ import 'react-image-gallery/styles/css/image-gallery.css';
 import { Rating, Divider, Button, List, Image } from 'semantic-ui-react';
 import Comments from '../Comments';
 import Navbar from 'reactjs-navbar';
+import axios from 'axios';
+
 // import {NavBar} from '../NavBar'
 import {
     faUsers,
@@ -15,6 +17,8 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import logo192 from './logo192.png';
 import 'reactjs-navbar/dist/index.css';
+
+const API_URL = 'http://localhost:8000/';
 
 function ProductDetails() {
     const [size, setSize] = useState(['S', 'M', 'L', 'XL']);
@@ -50,8 +54,14 @@ function ProductDetails() {
     const [price, setPrice] = useState('');
     const [images, setImages] = useState([]);
     const [status, setStatus] = useState(false);
+    const [asin, setAsin] = useState("");
+    const [reviews, setReviews] = useState([]);
     const getProductDetails = () => {
         var details = JSON.parse(localStorage.getItem('properties') || '{}');
+
+        
+
+        setAsin(details.asin)
         setDetails(details);
         setProductDescription(details.description);
         setProductName(details.title);
@@ -59,6 +69,13 @@ function ProductDetails() {
         setProductCurrency(details.currency);
         setPrice(details.price);
         console.log(details);
+        axios
+            .get(
+                API_URL + 'recommendation/productreview-asin/' + details.asin,
+            )
+            .then(response => {
+                console.log(response.data)
+                setReviews(response.data)});
         var picsArray: any = [];
         var pictures: any = {
             original: '',
@@ -169,7 +186,7 @@ function ProductDetails() {
                         {size.map((size, i) => {
                             if (currentIndex === i) {
                                 return (
-                                    <Button
+                                    <Button key={i}
                                         basic
                                         color="blue"
                                         onClick={() => {
@@ -259,7 +276,7 @@ function ProductDetails() {
                     ) : null}
                 </Col>
             </Row>
-            <Comments />
+            <Comments reviews={reviews}/>
         </div>
     );
 }

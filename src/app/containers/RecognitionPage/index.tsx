@@ -9,6 +9,7 @@ import axios from 'axios';
 import { Redirect } from 'react-router-dom';
 
 let NETLIFY_URL = 'recognize-and-recommend.netlify.app';
+const API_URL = "http://localhost:8000/"
 
 function image64toCanvasRef(
     canvasRef: HTMLCanvasElement | null,
@@ -56,6 +57,7 @@ export function RecognitionPage() {
     const [authToken, setAuthToken] = useState('');
     const [userPic, setUserPic] = useState('');
     const handleClose = () => setShow(false);
+    const [modelLoaded, loadModel] = useState(false);
 
     const onChange = e => {
         console.log(e.target.value);
@@ -70,9 +72,9 @@ export function RecognitionPage() {
         handleClose();
         let remote_url = '';
         if (process.env.NODE_ENV == 'development') {
-            remote_url = 'https://recognize-and-recommend.herokuapp.com/';
+            remote_url = API_URL;
         } else {
-            remote_url = 'https://recognize-and-recommend.herokuapp.com/';
+            remote_url = API_URL;
         }
         console.log(userPic);
         let payload = {
@@ -80,7 +82,7 @@ export function RecognitionPage() {
             profile_photo: userPic,
         };
         axios
-            .post(remote_url + 'recognition/create-user/', payload)
+            .post(remote_url + 'recognition/create-user', payload)
             .then(response => {
                 console.log(response.data);
                 setAuthToken(response.data.auth_token);
@@ -89,31 +91,42 @@ export function RecognitionPage() {
     };
     const webcamRef = React.useRef(null);
     const detectFace = async function () {
-        if (process.env.NODE_ENV == 'development') {
-            await faceapi.nets.ssdMobilenetv1
-                .loadFromUri('/models')
-                .then(error => {
-                    console.log('ssdMobilenetv1 Model Loaded', error);
-                    // alert("Model Loaded. Face Detection Will Start Now.")
-                });
-        } else {
-            await faceapi.nets.ssdMobilenetv1
-                .loadFromUri('/models')
-                .then(error => {
-                    console.log('ssdMobilenetv1 Model Loaded', error);
-                    // alert('Model Loaded. Face Detection Will Start Now.');
-                });
+        if (modelLoaded != true) {
+
+
+            if (process.env.NODE_ENV == 'development') {
+                await faceapi.nets.ssdMobilenetv1
+                    .loadFromUri('/models')
+                    .then(error => {
+                        console.log('ssdMobilenetv1 Model Loaded', error);
+                        // alert("Model Loaded. Face Detection Will Start Now.")
+                    });
+            } else {
+                await faceapi.nets.ssdMobilenetv1
+                    .loadFromUri('/models')
+                    .then(error => {
+                        console.log('ssdMobilenetv1 Model Loaded', error);
+                        // alert('Model Loaded. Face Detection Will Start Now.');
+                    });
+            }
+            loadModel(true);
         }
 
         setInterval(async () => {
             if (redirectTool === false) {
                 const input = document.getElementsByTagName('video')[0];
+                if (input == undefined || input == null) {
+                    return
+                }
                 // @ts-ignore
                 const detection = await faceapi.detectSingleFace(input);
                 if (detection != undefined) {
                     const displaySize = videoConstraints;
                     const canvas = document.getElementById('overlay');
 
+                    if (canvas == undefined || canvas == null) {
+                        return
+                    }
                     // @ts-ignore
                     const dims = faceapi.matchDimensions(canvas, input, true);
                     // @ts-ignore
@@ -141,19 +154,14 @@ export function RecognitionPage() {
                         myCrop,
                     );
                     // @ts-ignore
-                    // setUserPic(croppedBase64);
+                    setUserPic(croppedBase64);
                     // console.log(croppedBase64);
                     let payload = {
-                        face: croppedBase64,
+                        face: base64Image,
                     };
                     let remote_url;
-                    if (process.env.NODE_ENV == 'development') {
-                        remote_url =
-                            'https://recognize-and-recommend.herokuapp.com/';
-                    } else {
-                        remote_url =
-                            'https://recognize-and-recommend.herokuapp.com/';
-                    }
+                    remote_url = API_URL;
+
                     if (activeAPI === true) {
                         axios
                             .post(
@@ -163,14 +171,20 @@ export function RecognitionPage() {
                             .then(response => {
                                 console.log(response.data);
                                 let data = response.data.data;
+                                let status = response.data.status;
                                 setShowAlert(false);
                                 console.log(data.name);
-                                if (data.name === 'unknown') {
+
+                                if (status === false) {
                                     setShow(true);
                                     setStatus(false);
                                     setActiveAPI(false);
                                 } else {
+                                    window.sessionStorage.setItem("auth_token",
+                                        data.auth_token);
+                                    
                                     setRedirectTool(true);
+
                                 }
                             });
                     }
@@ -183,6 +197,7 @@ export function RecognitionPage() {
         detectFace();
     });
     if (redirectTool === true) {
+
         return <Redirect to="/user-products" />;
     } else
         return (
@@ -234,11 +249,11 @@ export function RecognitionPage() {
                 </PageWrapper>
                 <Modal show={show} onHide={handleClose}>
                     <Modal.Header closeButton>
-                        <Modal.Title>Modal heading</Modal.Title>
+                        <Modal.Title>Welcome To RandR</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         <Form.Group controlId="formBasicEmail">
-                            <Form.Label>Enter Your Name</Form.Label>
+                            <Form.Label>Please, Enter Your Name</Form.Label>
                             <Form.Control
                                 type="text"
                                 name="newUserName"
