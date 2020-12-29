@@ -52,6 +52,7 @@ export default function UserProducts() {
     const [price, setPrice] = React.useState([]);
     const [bullets, setBullets] = React.useState([]);
     const [details, setDetails] = React.useState(detail);
+    const [userDetails, setUserDetails] = React.useState({ username: '' });
 
     const setProperties = details => {
         var properties = details;
@@ -172,11 +173,29 @@ export default function UserProducts() {
                 console.log(loader);
             });
     };
+    const getUserDetails = () => {
+        console.log("I am fetechin user details" + window.sessionStorage.getItem("auth_token"))
+        axios
+            .get(
+                API_URL + 'api/v1/users/me', {
+                headers: {
+                    
+                    
+                    'Authorization': 'Token  ' + window.sessionStorage.getItem("auth_token"), 
+           
+                }
+            }
+            ).then(response => {
+                console.log(response);
+                setUserDetails(response.data)
+            })
+    }
     useEffect(() => {
         getCategories();
         getBullets();
         getImages();
         getPrice();
+        getUserDetails();
     }, []);
     useEffect(() => {
         if (
@@ -201,7 +220,7 @@ export default function UserProducts() {
                 }}
                 menuItems={[
                     {
-                        title: 'Administration',
+                        title: 'User : ' + userDetails.username,
                         icon: faUsers,
                         isAuth: true,
                         onClick: () => {

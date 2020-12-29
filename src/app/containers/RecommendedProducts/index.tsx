@@ -165,6 +165,7 @@ export default function Products() {
     const [price, setPrice] = React.useState([]);
     const [bullets, setBullets] = React.useState([]);
     const [details, setDetails] = React.useState(detail);
+    const [userDetails, setUserDetails] = React.useState({ username: '' });
     const setProperties = details => {
         var properties = details;
         localStorage.setItem('properties', JSON.stringify(properties));
@@ -216,7 +217,7 @@ export default function Products() {
             .get(
                 API_URL + 'recommendation/recommended-products', {
                 headers: {
-                    "Authorization": "Token " + window.sessionStorage.getItem("user_token")
+                    "Authorization": "Token " + window.sessionStorage.getItem("auth_token")
                 }
             }
             )
@@ -276,11 +277,25 @@ export default function Products() {
                 setDetails(productData);
             });
     };
+    const getUserDetails = () => {
+        axios
+            .get(
+                API_URL + 'api/v1/users/me', {
+                headers: {
+                    "Authorization": "Token " + window.sessionStorage.getItem("auth_token")
+                }
+            }
+            ).then(response => {
+                console.log(response);
+                setUserDetails(response.data)
+            })
+    }
     useEffect(() => {
         getCategories();
         getBullets();
         getImages();
         getPrice();
+        getUserDetails();
     }, []);
     useEffect(() => {
         if (
@@ -290,6 +305,7 @@ export default function Products() {
             bullets.length > 0
         ) {
             getProducts();
+
         }
     }, [category, bullets, images, price]);
 
@@ -305,7 +321,7 @@ export default function Products() {
                 }}
                 menuItems={[
                     {
-                        title: 'Administration',
+                        title: 'User : ' + userDetails.username,
                         icon: faUsers,
                         isAuth: true,
                         onClick: () => {

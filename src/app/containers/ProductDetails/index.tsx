@@ -56,6 +56,7 @@ function ProductDetails() {
     const [status, setStatus] = useState(false);
     const [asin, setAsin] = useState("");
     const [reviews, setReviews] = useState([]);
+    const [userDetails, setUserDetails] = React.useState({ username: '' });
     const getProductDetails = () => {
         var details = JSON.parse(localStorage.getItem('properties') || '{}');
 
@@ -91,6 +92,19 @@ function ProductDetails() {
         }
         setImages(picsArray);
     };
+    const getUserDetails = () => {
+        axios
+            .get(
+                API_URL + 'api/v1/users/me', {
+                headers: {
+                    "Authorization": "Token " + window.sessionStorage.getItem("auth_token")
+                }
+            }
+            ).then(response => {
+                console.log(response);
+                setUserDetails(response.data)
+            })
+    }
     useEffect(() => {
         getProductDetails();
     }, []);
@@ -103,7 +117,7 @@ function ProductDetails() {
                 }}
                 menuItems={[
                     {
-                        title: 'Administration',
+                        title: 'User : ' + userDetails.username,
                         icon: faUsers,
                         isAuth: true,
                         onClick: () => {
