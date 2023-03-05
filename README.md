@@ -1,142 +1,64 @@
-<img width="914" alt="React Boilerplate Meets CRA" src="https://user-images.githubusercontent.com/3495307/80274591-2d5daa00-86e4-11ea-8fba-404f1cdba87e.png" align="center">
-<br />
+# Recognize And Recommend
 
-<div align="center" >Crafted for <strong>highly scalable</strong> & <strong>performant</strong> and <strong>easily maintainable</strong> React.js applications <br /> 
-with a focus on  
-<strong>best DX</strong> and <strong>best practices</strong>.
-</div>
+A smart AI application, which can be integrated with superstores or outlets to recognize it’s customers through face and recommend relevant products.
 
-<br />
+## Introduction
 
-<div align="center">
-  <a href="https://github.com/react-boilerplate/react-boilerplate-cra-template/actions?query=workflow%3Abuild">
-    <img src="https://github.com/react-boilerplate/react-boilerplate-cra-template/workflows/build/badge.svg" alt="Build Status" />
-  </a>
-  <a href="https://github.com/react-boilerplate/react-boilerplate-cra-template/actions?query=workflow%3Atests">
-    <img src="https://github.com/react-boilerplate/react-boilerplate-cra-template/workflows/test/badge.svg" alt="Tests Status" />
-  </a>
-  <a href="https://github.com/react-boilerplate/react-boilerplate-cra-template/actions?query=workflow%release">
-    <img src="https://github.com/react-boilerplate/react-boilerplate-cra-template/workflows/release/badge.svg" alt="Release Status" />
-  </a>
-</div>
+Recognize and Recommend is a smart Artificial Intelligence Application which has been built on cutting edge technologies including django for backend and a demo frontend application which has been built on React.js. Purpose of the application is to recognize customers arriving in malls/outlets or superstore through their faces and recommend them products which best suit their interest. Application uses facial recognition system to Recognize customers with the help of a good cctv camera and then show the customer products on screen via collaborative filtering recommendation system.
 
-<div align="center">
-  <a href="https://coveralls.io/github/react-boilerplate/react-boilerplate-cra-template">
-    <img src="https://coveralls.io/repos/github/react-boilerplate/react-boilerplate-cra-template/badge.svg?branch=master" alt="Coverage" />
-  </a>
-  <a href="https://opencollective.com/react-boilerplate">
-    <img src="https://opencollective.com/react-boilerplate/backers/badge.svg" alt="Backers" />
-  </a>
-  <a href="https://opencollective.com/react-boilerplate/">
-    <img src="https://opencollective.com/react-boilerplate/sponsors/badge.svg" alt="Sponsors" />
-  </a>
-</div>
 
-<br />
 
----
+## Methodology
+Application uses a fair quality camera to detect a user's face which is then sent to the backend, we have integrated a highly efficient image detector and recognizer which initially detects a face in image and then encodes its features and saves it to a database with a name or system generated label. When the customer comes back to the store application identifies the person, with the help of recognition api.
+	Our second component is the product recommendation system. When a user has been successfully identified system checks history of items purchased and user ratings on products. And with collaborative filtering, recommends the user, the products which have been rated good by other users having same interests.
 
-The official [Create React App](https://github.com/facebook/create-react-app) template of [React Boilerplate](https://github.com/react-boilerplate/react-boilerplate)
-![](https://img.shields.io/github/stars/react-boilerplate/react-boilerplate?style=flat)
 
-Start your `create-react-app` projects in seconds with the best, industry-standard tools and practices made ready for you.
+![methodology](public/image8.png)
 
-**📚Documentation:** [Gitbook](https://cansahin.gitbook.io/react-boilerplate-cra-template/)
+### Recognition
+- ![recognition](public/image2.png)
 
-**🎨 Check the example app:** [Boilerplate Example Application](https://react-boilerplate.github.io/react-boilerplate-cra-template/)
+### Recommendation
+- ![products](public/image1.png)
+- ![products2](public/image5.png)
+- ![products3](public/image6.png)
 
-**🚑 Collection of `'HOW TO'`s:** [Examples & Tutorials for common patterns](https://github.com/react-boilerplate/cra-template-examples)
 
-**📦 Package:** [npm](https://www.npmjs.com/package/cra-template-rb)
 
-![version](https://img.shields.io/npm/v/cra-template-rb)
-![version](https://img.shields.io/npm/dm/cra-template-rb)
+## Development Phases:
+    
+- ### Data Collection
+    Our primary data source is amazon. We collected a dataset containing Amazon Product reviews. With the help of ids in the dataset we scrapped the Amazon website to get complete information about the products including Images, description rating price and similar product data.
 
----
+- ### Data Cleaning and Categorization
+    We have two primary points to use the data
+    - Presenting recommended products to customers.
+    - For training our model to generate recommendations.
+    
+    For representation we used the raw data, However for recommendation all we needed was product Ids, Customer Ids and Ratings of customer. So we dropped extra labels and used this cleaned data for our recommendation system.
 
-## Install & Start
+- ### Face Detection and Recognition
+    We have used a face detection api on the frontend which detects faces from video and sends it to the backend, on backend we have deployed separate modules for face recognition, Haar cascade and LBPH and face recognition API. We have tested and integrated both with our application, right now we are using face_recognition API because of its speed and accuracy.
 
-Create React App with the template
+- ### Product Recommendation:
+    We have used collaborative filtering on products to recommend a product to a user which has received good ratings from other customers having same product buying history or purchasing interests.
 
-```shell
-npx create-react-app --template cra-template-rb my-app
-```
+## ML and DL Models
+    
+- ### SSD Mobilenet V1:
+    The mobilenet-ssd model is a Single-Shot multibox Detection (SSD) network intended to perform object detection. This model is implemented using the Caffe* framework. We have used this model on frontend to detect face from video being captured by the camera.
 
-Start and check our example app, if you want
 
-```shell
-cd my-app
-npm start
-```
+- ### Haar cascade:
+    Haar feature-based cascade classifiers is an effective object detection method proposed by Paul Viola and Michael Jones in their paper, “Rapid Object Detection using a Boosted Cascade of Simple Features” in 2001. It is a machine learning based approach where a cascade function is trained from a lot of positive and negative images. It is then used to detect objects in other images.
+	We have used this model on the backend, after getting the image from the front we feed the image to haar cascade to generate features.
 
-Remove the example app to start your project!
+- ### LBPH:
+    Local Binary Pattern (LBP) is a simple yet very efficient texture operator which labels the pixels of an image by thresholding the neighborhood of each pixel and considers the result as a binary number. 
 
-```shell
-npm run cleanAndSetup
-```
+- ### Collaborative Filtering Recommendation: 
+    Collaborative filtering (CF) is the process of filtering or evaluating items through the opinions of other people. CF technology brings together the opinions of large interconnected communities on the web, supporting filtering of substantial quantities of data. We have used this recommendation model to recommend products to customers.
 
-## Features
-
-<dl>
-
-  <dt>Predictable state management</dt>
-  <dd>Unidirectional data flow allows for change logging and time travel debugging.</dd>
-
-  <dt>Instant feedback</dt>
-  <dd>Enjoy the best DX (Developer eXperience) and code your app at the speed of thought! Your saved changes to the CSS and JS are reflected instantaneously without refreshing the page. Preserve application state even when you update something in the underlying code!</dd>
-
-  <dt>Next generation CSS</dt>
-  <dd>Write composable CSS that's co-located with your components for complete modularity. Unique generated class names keep the specificity low while eliminating style clashes. Ship only the styles that are on the page for the best performance.</dd>
-
-  <dt>Industry-standard routing</dt>
-  <dd>It's natural to want to add pages (e.g. `/about`) to your application, and routing makes this possible.</dd>
-
-  <dt>Industry-standard i18n internationalization support</dt>
-  <dd>Scalable apps need to support multiple languages, easily add and support multiple languages.</dd>
-
-  <dt>Typescript</dt>
-  <dd>Typescript is the key to scalability. Build self-documented code, easy-to-debug code and create maintainable large applications and codebases with a highly productive development experience.</dd>
-
-  <dt>Quick scaffolding</dt>
-  <dd>Create components, containers, routes, selectors and sagas - and their tests - right from the CLI!</dd>
-
-  <dt>Static code analysis</dt>
-  <dd>Focus on writing new features without worrying about formatting or code quality. With the right editor setup, your code will automatically be formatted and linted as you work.</dd>
-
-  <dt>SEO</dt>
-  <dd>We support SEO (document head tags management) for search engines that support indexing of JavaScript content. (eg. Google)</dd>
-</dl>
-
-But wait... there's more!
-
-- _The best test setup:_ Automatically guarantee code quality and non-breaking
-  changes. (Seen a react app with 100% test coverage before?)
-- _The fastest fonts:_ Say goodbye to vacant text.
-- _Stay fast_: Profile your app's performance from the comfort of your command
-  line!
-
-<sub><i>Keywords: Create React App, React Boilerplate, Custom Template, Typescript, React.js, Redux, Hot Reloading, ESNext, Babel, react-router, Offline First, ServiceWorker, `styled-components`, redux-saga, FontFaceObserver</i></sub>
-
-## Contributors
-
-<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-<!-- prettier-ignore-start -->
-<!-- markdownlint-disable -->
-<table>
-  <tr>
-    <td align="center"><a href="https://github.com/Can-Sahin"><img src="https://avatars2.githubusercontent.com/u/33245689" width="80px;" alt=""/><br /><sub><b>Can Sahin</b></sub></a><br /><a href="https://github.com/react-boilerplate/react-boilerplate-cra-template/commits?author=Can-Sahin" title="Code">💻</a> <a href="https://github.com/react-boilerplate/react-boilerplate-cra-template/commits?author=Can-Sahin" title="Documentation">📖</a> <a href="#ideas-Can-Sahin" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/react-boilerplate/react-boilerplate-cra-template/pulls?q=is%3Apr+reviewed-by%3ACan-Sahin" title="Reviewed Pull Requests">👀</a> <a href="https://github.com/react-boilerplate/react-boilerplate-cra-template/commits?author=Can-Sahin" title="Tests">⚠️</a></td>
-    <td align="center"><a href="https://github.com/receptiryaki"><img src="https://avatars0.githubusercontent.com/u/3495307" width="80px;" alt=""/><br /><sub><b>Recep Tiryaki</b></sub></a><br /><a href="https://github.com/react-boilerplate/react-boilerplate-cra-template/commits?author=receptiryaki" title="Code">💻</a> <a href="#ideas-receptiryaki" title="Ideas, Planning, & Feedback">🤔</a></td>
-  </tr>
-</table>
-
-<!-- markdownlint-enable -->
-<!-- prettier-ignore-end -->
-
-<!-- ALL-CONTRIBUTORS-LIST:END -->
-
-This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
-
-## License
-
-This project is licensed under the MIT license, Copyright (c) 2019 Can Sahin.
-For more information see `LICENSE.md`.
+## Acknowledgements
+This project was a Semester Project for the course "Human Computer Interaction" by "Dr Rauf Shams Malick" FALL 2020.
+Built in collaboration with M.Hassan Ahmed, Noman Anjum, Ahsan Siddique.
