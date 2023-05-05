@@ -13,6 +13,10 @@ A cutting-edge AI application designed for integration with superstores and outl
   - [Data Cleaning and Categorization](#data-cleaning-and-categorization)
   - [Face Detection and Recognition](#face-detection-and-recognition)
   - [Product Recommendation](#product-recommendation)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+  
 - [Machine Learning and Deep Learning Models](#machine-learning-and-deep-learning-models)
 - [Acknowledgements](#acknowledgements)
 
@@ -66,6 +70,44 @@ Collaborative filtering is used to recommend products to users based on their pu
 - **Haar cascade**: A machine learning-based approach for object detection, used on the backend to generate features after receiving the image from the frontend.
 - **LBPH**: Local Binary Pattern (LBP) is an efficient texture operator that labels image pixels by thresholding the neighborhood of each pixel, considering the result as a binary number.
 - **Collaborative Filtering Recommendation**: A recommendation model that filters or evaluates items based on the opinions of other users, helping to recommend products to customers.
+
+## Getting Started
+
+### Prerequisites
+  - Python 3.6+
+  - Node.js
+  - NPM or Yarn
+
+### Installation
+  1. Clone the frontend repository:
+     
+     git clone https://github.com/hassan11196/RecognizeAndRecommend.git`
+
+  2. Clone the backend repository:
+  
+    git clone https://github.com/hassan11196/RecognizeAndRecommend-Backend.git
+
+  3. Install Python dependencies for the backend:
+    
+    cd RecognizeAndRecommend-Backend
+    pip install -r requirements.txt
+
+  4. Install frontend dependencies:
+  
+    cd ../RecognizeAndRecommend/frontend
+    npm install
+
+  5. Run the backend development server:
+  
+    cd ../RecognizeAndRecommend-Backend
+    python manage.py runserver
+
+  6. Launch the frontend:
+    
+    cd ../RecognizeAndRecommend/frontend
+    npm start
+
+
 
 ## Acknowledgements
 
