@@ -1,5 +1,5 @@
 # Recognize and Recommend
-
+![logo](src/assets/Recognize%20&%20Recommend.png)
 A cutting-edge AI application designed for integration with superstores and outlets to recognize customers through facial recognition and recommend relevant products based on their interests and purchase history.
 
 ## Table of Contents
